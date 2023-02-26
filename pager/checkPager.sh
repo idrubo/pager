@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ ! -x 'pager' ] ; then
-  echo 'Compiling the pager'
+if [ ! -x 'mPager' ] ; then
+  echo 'Compiling mPager'
   make
 fi
 
@@ -13,25 +13,31 @@ echo '-----------------'
 echo '--- First run ---'
 echo '-----------------'
 echo
-./pager -l 30 -c 25 file1.txt file2.txt file3.txt
+echo 'command: ./mPager -l 30 -c 25 file1.txt file2.txt file3.txt'
+echo 'Hit intro to run mPager' ; read
+./mPager -l 30 -c 25 file1.txt file2.txt file3.txt
 
 # Leaving the default of 80 lines per page
 # and 40 of colums per line
 # Reading from the example files
-echo
+clear
 echo '------------------'
 echo '--- Second run ---'
 echo '------------------'
 echo
-./pager file1.txt file2.txt file3.txt
+echo 'command: ./mPager file1.txt file2.txt file3.txt'
+echo 'Hit intro to run mPager' ; read
+./mPager file1.txt file2.txt file3.txt
 
 # Reading from stdin
-echo
+clear
 echo '------------------'
 echo '--- Third run ---'
 echo '------------------'
 echo
-cat file1.txt file2.txt file3.txt | ./pager
+echo 'command: cat file1.txt file2.txt file3.txt | ./mPager'
+echo 'Hit intro to run mPager' ; read
+cat file1.txt file2.txt file3.txt | ./mPager
 
 exit 0
 
