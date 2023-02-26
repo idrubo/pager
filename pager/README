@@ -28,6 +28,9 @@
  * "checkPager.sh" - Bash script to check the pager.
  * "mPager.c" - The pager.
  *
+ * The program is divided in three modules, "memory.c" for memory management,
+ * "mPager.c" as the main program and "format.c" to print to the screen.
+ *
  * The description points to an "extra feature", we assume it is compulsary.
  *
  * The description doesn't mention any kind of user input. It is only enabled
@@ -93,8 +96,8 @@
  * 3.- It can easily be printed at "prnHeader" function.
  * 4.- Same as above.
  * 5.- Since reading a page and printing it is done on different modules we
- * could modify the formating routine accordingly. Another module could be
- * added to manage ncurses, making the program follow the MVC pattern.
+ * could modify the formating module accordingly. All ncurses related code
+ * added to the format module, making the program follow the MVC pattern.
  * 6.- Like above.
  */
 

@@ -1,5 +1,4 @@
 #include "mPager.h"
-#include "memory.h"
 
 int nRows = N_ROWS_MAX, nCols = N_COLS_MAX;
 
@@ -103,50 +102,6 @@ int splitLines (struct pages * page, char * line)
   }
 
   return full;
-}
-
-void fmtPage (struct pages * page)
-{
-  static int nPages = 1, dl = 0, h = 1;
-
-  /* Iterate until the memory page is empty */
-  while (notEmpty (page))
-  {
-    /* Print the screen page header */
-    if (h)
-    {
-      h = 0;
-      prnHeader (nPages++);
-    }
-
-    /* Keep track of the number of lines already sent */
-    dl++;
-
-    printf ("%s", loadLine (page));
-
-    if (dl == nRows)
-    {
-      h = 1, dl = 0;
-      printf ("\n");
-      if (isatty (STDIN_FILENO)) userInput ();
-    }
-  }
-  resetPage (page);
-}
-
-/* Printing a header with the page number */
-void prnHeader (int nPages)
-{
-  int j;
-  for (j = 0; j < (nCols / 2); j++) printf (" ");
-  printf ("--- Page: %d ---\n", nPages);
-}
-
-/* Asking for user input */
-void userInput (void)
-{
-  printf ("Hit intro to continue.");
-  while (getchar () != '\n');
 }
 
 int getLines (void) { return nRows; }

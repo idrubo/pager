@@ -4,8 +4,8 @@ mPager := mPager
 
 all: $(mPager)
 
-$(mPager): $(mPager).c memory.c memory.h
-	$(CC) $(CFLAGS) $< memory.c -o $@
+$(mPager): $(mPager).c memory.c memory.h format.c format.h
+	$(CC) $(CFLAGS) $< memory.c format.c -o $@
 
 .PHONY: clean
 
