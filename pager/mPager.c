@@ -1,29 +1,6 @@
 #include "mPager.h"
 #include "memory.h"
 
-/*
-* Memory manangement:
-* 
-* Put all memory management files at "memory.c"
-* 
-* 1.- Allocate a page with malloc.
-* 
-* 2.- Start reading lines and fill the page.
-* 2.1.- Keep track of the number of lines.
-* 2.2.- Keep track of the amount of memory used.
-* 2.3.- Realloc memory as needed.
-* 
-* 3.- Format and print the page.
-* 3.1.- Print the header.
-* 3.2.- Print 80 lines.
-* 3.3.- Print the footer and ask for user input.
-* 3.4.- Keep track of the number of lines.
-* 3.5.- Keep track of the amount of memory used.
-* 3.6.- Repeat 3.1 to 3.5 until no lines are left.
-* 
-* 4.- Repeat 2 and 3 until the end of the file.
-*/
-
 int nRows = N_ROWS_MAX, nCols = N_COLS_MAX;
 
 int main (int argc, char * argv [])
@@ -74,18 +51,24 @@ void loadPage (FILE * textF, struct pages * page)
   char * line = NULL;
   size_t N = 0l;
 
+  /* Iterating until the whole file is read */
   while (! feof (textF))
   {
+    /* Read line by line */
     if (getline (& line, & N, textF) == EOF) break;
 
+    /* If the line is too big, split it into smaller blocks */
     if (strlen (line) > nCols)
       full = splitLines (page, line);
+    /* Or else save it */
     else
       full = saveLine (page, line);
 
+    /* When the memory page is full format it*/
     if (full) fmtPage (page);
   }
 
+  /* There may be still lines in memory */
   fmtPage (page);
 }
 
@@ -124,33 +107,26 @@ int splitLines (struct pages * page, char * line)
 
 void fmtPage (struct pages * page)
 {
-  static int nPages = 1, lv = 0, h = 1;
+  static int nPages = 1, dl = 0, h = 1;
 
- /* 
-  * El bucle debe contemplar que el buffer puede contener más de una página.
-  * Además las páginas no tendrán una longitud fija.
-  * 1.- Bolcar el buffer completo en la pantalla.
-  * 2.- Mantener un registro del número de lineas_volcadas.
-  * 3.- Volcar un número de lineas = nRows - lineas_volcadas.
-  * 4.- lineas_volcadas = nRows.
-  * 5.- Repetir 3 y 4 hasta que el buffer esté vacío.
-  */
-
+  /* Iterate until the memory page is empty */
   while (notEmpty (page))
   {
+    /* Print the screen page header */
     if (h)
     {
       h = 0;
       prnHeader (nPages++);
     }
 
-    lv++;
+    /* Keep track of the number of lines already sent */
+    dl++;
 
     printf ("%s", loadLine (page));
 
-    if (lv == nRows)
+    if (dl == nRows)
     {
-      h = 1, lv = 0;
+      h = 1, dl = 0;
       printf ("\n");
       if (isatty (STDIN_FILENO)) userInput ();
     }

@@ -1,11 +1,9 @@
 CFLAGS := -Wall -g -O2
 
-pager := pager
 mPager := mPager
 
-all: $(pager) $(mPager)
+all: $(mPager)
 
-$(pager):
 $(mPager): $(mPager).c memory.c memory.h
 	$(CC) $(CFLAGS) $< memory.c -o $@
 
@@ -13,6 +11,5 @@ $(mPager): $(mPager).c memory.c memory.h
 
 clean:
 	rm -f core
-	rm -f $(pager)
 	rm -f $(mPager)
 

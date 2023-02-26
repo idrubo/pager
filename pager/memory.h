@@ -11,6 +11,7 @@
 
 #define B_SIZE 1024ul
 
+/* Declaration of a page */
 struct pages
 {
   char * buffer;

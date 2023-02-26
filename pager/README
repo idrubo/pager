@@ -17,7 +17,7 @@
  *
  * So I tried a second aproach, this time a small memory module was written.
  * A whole page is read from an input file and saved into memory. Then the
- * page reach "nCols" lines it is dump to the screen. Formatting gets more
+ * page reach "nRows" lines it is dump to the screen. Formatting gets more
  * simple this way. That is the delivered solution.
  *
  * Exercise 2:
@@ -61,7 +61,7 @@
  *
  * In this latter function we step over every line saving it to a queue. If
  * the line length is greater than "nCols" it is broken into smaller blocks
- * with "nCols" length. When the queue gets full (with at least "nCols"
+ * with "nCols" length. When the queue gets full (with at least "nRows"
  * lines, it is formatted and printed to the screen. Once all contents is
  * printed the queue is reset.
  *
