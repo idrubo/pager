@@ -118,6 +118,20 @@ int parseCmd (int argc, char * argv [])
   char * lvalue = NULL, * cvalue = NULL;
   int ch;
 
+  /* DEBUG */
+  /* DEBUG */
+  /* DEBUG */
+  if (argc == 1)
+    if (isatty (STDIN_FILENO))
+    {
+      printf ("I need a pipe to feed from.\n");
+      printf ("Take a look at \"checkPager.sh\".\n");
+      exit (EXIT_FAILURE);
+    }
+  /* DEBUG */
+  /* DEBUG */
+  /* DEBUG */
+
   opterr = 0;
 
   while ((ch = getopt (argc, argv, "l:c:")) != -1)

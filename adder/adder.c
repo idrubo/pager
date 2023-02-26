@@ -32,7 +32,7 @@
  * ((1 + n) * n) <= INT_MAX
  *
  *  2
- * n  +  n - INT_MAX = 0
+ * n  +  n - INT_MAX <= 0
  *
  * and we get:
  *

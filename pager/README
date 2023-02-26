@@ -94,10 +94,11 @@
  * files may have specific number of lines and line lengths to check the
  * program behaviour. We can use "gcov" to ensure the desired code coverage.
  * 3.- It can easily be printed at "prnHeader" function.
- * 4.- Same as above.
+ * 4.- Like above.
  * 5.- Since reading a page and printing it is done on different modules we
  * could modify the formating module accordingly. All ncurses related code
- * added to the format module, making the program follow the MVC pattern.
+ * could be added to the format module, making the program follow the MVC
+ * logic pattern.
  * 6.- Like above.
  */
 

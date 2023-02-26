@@ -8,6 +8,9 @@ all: $(check) $(dows)
 $(check):
 
 $(dows): $(dows).c
+	@echo !!!!!!!!!!!!!!!!
+	@echo We compile here to find the errors and warnings of $(dows)
+	@echo !!!!!!!!!!!!!!!!
 	$(CC) $(CFLAGS) -c $<
 
 .PHONY: clean
