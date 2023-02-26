@@ -60,6 +60,7 @@ int main (void)
   return 0;
 }
 
+/* Original function */
 static void get_dow (unsigned char dow, char * dowt)
 {
   int i, found, pos;
@@ -87,9 +88,10 @@ static void get_dow (unsigned char dow, char * dowt)
   }
 }
 
+/* Simplified version */
 static void get_dowS (unsigned char dow, char * dowt)
 {
-  int i, found = 0;
+  int i, found = 0; /* "pos" is eliminated */
 
   dowt [0] = '\0';
 
@@ -97,6 +99,7 @@ static void get_dowS (unsigned char dow, char * dowt)
   {
     if (dow & ( 1 << i ))
     {
+      /* "strcat" is used instead of pointer arithmetic */
       strcat (dowt, dows [i]);
       found = 1;
     }
@@ -105,7 +108,7 @@ static void get_dowS (unsigned char dow, char * dowt)
   if (found)
     dowt [strlen (dowt) - 1] = '\0';
   else
-    strcpy (dowt, notFound);
+    strcpy (dowt, notFound); /* We use a predefined strig constant */
 }
 
 void prnDow (unsigned char dow, char * dowt)

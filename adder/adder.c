@@ -40,7 +40,7 @@
  *
  * that we can compute using floats.
  *
- * The formula can be used as far as overflows are taken into account.
+ * The formula can be used to take care of overflows.
  *
  */
 

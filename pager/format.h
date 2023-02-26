@@ -1,3 +1,4 @@
+/* To format and print a page */
 
 #ifndef format_h 
 #define format_h

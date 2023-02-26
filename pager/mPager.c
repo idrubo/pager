@@ -118,19 +118,14 @@ int parseCmd (int argc, char * argv [])
   char * lvalue = NULL, * cvalue = NULL;
   int ch;
 
-  /* DEBUG */
-  /* DEBUG */
-  /* DEBUG */
   if (argc == 1)
     if (isatty (STDIN_FILENO))
     {
-      printf ("I need a pipe to feed from.\n");
-      printf ("Take a look at \"checkPager.sh\".\n");
+      printf ("I need a pipe to feed from !!!\n\n");
+      prnUsage ();
+      printf ("\nTake a look at \"checkPager.sh\".\n");
       exit (EXIT_FAILURE);
     }
-  /* DEBUG */
-  /* DEBUG */
-  /* DEBUG */
 
   opterr = 0;
 
@@ -175,7 +170,18 @@ int parseCmd (int argc, char * argv [])
 void prnUsage (void)
 {
   fprintf (stderr, "Usage:\n");
-  fprintf (stderr, "IGTtest [-l num.] [-c num.] [file ...]\n\n");
+  fprintf (stderr, "mPager [-l num.] [-c num.] [file ...]\n\n");
+  fprintf (stderr, "Examples:\n");
+  fprintf (stderr, "Changing the number of lines per page\n");
+  fprintf (stderr, "and the number of colums per line.\n");
+  fprintf (stderr, "Reading from the example files:\n");
+  fprintf (stderr, "\n./mPager -l 30 -c 25 file1.txt file2.txt file3.txt\n");
+  fprintf (stderr, "\nLeaving the default of 80 lines per page\n");
+  fprintf (stderr, "and 40 of colums per line.\n");
+  fprintf (stderr, "Reading from the example files:\n");
+  fprintf (stderr, "\n./mPager file1.txt file2.txt file3.txt\n");
+  fprintf (stderr, "\nReading from stdin\n");
+  fprintf (stderr, "\ncat file1.txt file2.txt file3.txt | ./mPager\n");
 }
 
 /* Convert an ASCII string to a number */

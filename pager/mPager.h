@@ -1,4 +1,3 @@
-
 #ifndef mPager_h 
 #define mPager_h
 

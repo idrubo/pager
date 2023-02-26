@@ -10,7 +10,7 @@ void initPage (struct pages *page)
 
   page->nLines  = 0lu; /* Number of lines stored */
   page->nBytes  = 0lu; /* Total bytes stored */
-  page->nBlocks = 1lu; /* Total page memory size is nBlocks * B_SIZE */
+  page->nBlocks = 1lu; /* Total page memory size is: nBlocks * B_SIZE */
 }
 
 /* Releasing allocated memory */
@@ -19,7 +19,7 @@ void freePage (struct pages * page)
   free (page->buffer);
 }
 
-/* When the page gets empty (all lines are printed) the page is reset */
+/* When the queue gets empty (all lines are printed) the page is reset */
 void resetPage (struct pages * page)
 {
   page->rd = 0lu;
@@ -69,7 +69,7 @@ char * loadLine (struct pages * page)
 }
 
 /*
- * Returns true if there are still lines to read, false if the page is empty
+ * Returns true if there are still lines to read, false if the queue is empty
  */
 int notEmpty (struct pages * page) { return page->nLines; }
 
