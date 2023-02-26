@@ -1,0 +1,106 @@
+/*
+ * The exercises description is written in English, so I'm delivering the
+ * answers in English.
+ *
+ * The programs will be compiled using libc-2.28 and gcc-8.3.0.
+ *
+ * All three exercises contain a Makefile to compile the code.
+ *
+ * I didn't have much diffilculty when solving exercises 1 and 3.
+ *
+ * Exercise 2, a bit longer, was a bit more difficult. The aproach of printing
+ * the lines as they are read has a catch. If the line is two big it must be
+ * broken down, so it is possible to reach the columns limit when reading a
+ * line. So, the header and the extra new line may be inserted when printing
+ * a page or when printing a line, making the program somewhat more complex.
+ *
+ * Exercise 2:
+ * ------------
+ *
+ * There are two programs in this solution:
+ *
+ * "checkPager.sh" - Bash script to check the pager.
+ * "pager.c" - The pager.
+ *
+ * The description points to an "extra feature", we assume it is compulsary.
+ *
+ * The description doesn't mention any kind of user input. It is only enabled
+ * when the input file is NOT stdin.
+ *
+ * We need to accept an arbitrary number of file names from the command line.
+ * So we define and array of pointers to strings, a pointer for every file
+ * name.
+ *
+ * We can keep an integer variable to count the number of files. Since we
+ * don't know the array length, it must be dynamically allocated.
+ * 
+ * The above is quite precisely "argc" and "argv" ANSI C definition. So we
+ * only need to use them to store and get filenames.
+ *
+ * We must read every file line by line. We can use C standard libraries
+ * functions for that task. We could use "gets" wich is portable but not so
+ * safe. We are using GNU C library "getline" instead.
+ *
+ * Since the exercise compels us to use gcc, we might reasonable assume that
+ * GNU C library will also be available, so "getline" will be allowed for us.
+ *
+ * The exercise asks to concatenate one text file after the other and
+ * show it to the screen in 80 line pages. We assume a length of 80 lines of
+ * text, as they are read from the file, without counting the one at the
+ * begining showing a page number, or the one at the end to allow user input.
+ *
+ * Here is a brief description for the pager:
+ *
+ * First we step over every file on the function "pager", sending a stream
+ * pointer to "prnPage".
+ *
+ * In this latter function we step over every line as we print a header for
+ * every page. A footer invites the user to continue by hitting "Intro" key.
+ * Since the line count may reach 80 when the lines are broken in blocks, the
+ * footer and the header may be shown at the function "prnLine". The variable
+ * "delayed" allows us to print the header at the begining of a new page,
+ * making sure it is not printed when there aren't any more pages to print.
+ *
+ * Finally, we write code for printing a single line at "prnLine", we split
+ * the lines in blocks with "nCols" size and print each block. It uses
+ * pointer arithmetics to do so:
+ *
+ * "* mark" keeps track of next block's first character and
+ * "block [nCols + 1]" stores every block.
+ *
+ * As you can see the aproach is to print the lines on the fly, that is, as
+ * they are read.
+ *
+ * We could also set up a buffer to store at least 80 lines and then print
+ * every page at once. That would easy page formatting at the cost of having
+ * to develop a memory management system.
+ */
+
+/*
+ * Improvements:
+ *
+ * 1.- We are using pointer arithmetics. So we would use a memory debugger
+ * (like valgrind) to make sure we don't get buffer overruns or other memory
+ * issues.
+ * 2.- We could write some more tests.
+ * 3.- The name of the file could be printed.
+ * 4.- The number of lines and total bytes for every file could be printed.
+ * 5.- The Linux terminal could be set to non-canonical mode to get keyboard
+ * user input without having to resort to "gethar ()", or use ncurses.
+ * 6.- We could allow the user navigate through the listed files with arrow keys
+ * and the like.
+ *
+ * To implement those improvements we could:
+ *
+ * 1.- Just run the program under valgrind with the makefile.
+ * 2.- We must add new text files and run the program against them. Those
+ * files may have specific line lengths to check the program behaviour. We can
+ * use "gcov" to ensure the desired code coverage.
+ * 3.- It can easily be printed at "prnHeader" function.
+ * 4.- Same as above.
+ * 5.- It may require to load all input data to a buffer and then show it on
+ * the terminal with ncurses. The program may need a new logic like the MVC
+ * pattern.
+ * 6.- Like above.
+ */
+

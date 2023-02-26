@@ -1,25 +1,28 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
+#include "mPager.h"
+#include "memory.h"
 
-#define N_ROWS_MAX 80ul
-#define N_COLS_MAX 40ul
-
-void pager (int argc, char * argv [], int iFiles);
-void prnPage (FILE * textF);
-int prnLine (char * line, int * nLines, int * nPages);
-int checkPage (int * nLines, int * nPages);
-void prnHeader (int nPages);
-void userInput (void);
-
-int parseCmd (int argc, char * argv []);
-void prnUsage (void);
-unsigned long xstrtoul (const char * s);
-
-void xfopen (FILE ** f, char * name);
-void xfclose (FILE * f);
+/*
+* Memory manangement:
+* 
+* Put all memory management files at "memory.c"
+* 
+* 1.- Allocate a page with malloc.
+* 
+* 2.- Start reading lines and fill the page.
+* 2.1.- Keep track of the number of lines.
+* 2.2.- Keep track of the amount of memory used.
+* 2.3.- Realloc memory as needed.
+* 
+* 3.- Format and print the page.
+* 3.1.- Print the header.
+* 3.2.- Print 80 lines.
+* 3.3.- Print the footer and ask for user input.
+* 3.4.- Keep track of the number of lines.
+* 3.5.- Keep track of the amount of memory used.
+* 3.6.- Repeat 3.1 to 3.5 until no lines are left.
+* 
+* 4.- Repeat 2 and 3 until the end of the file.
+*/
 
 int nRows = N_ROWS_MAX, nCols = N_COLS_MAX;
 
@@ -40,17 +43,18 @@ void pager (int argc, char * argv [], int iFiles)
 {
   int i;
   FILE * textF = NULL;
+  struct pages page;
+
+  initPage (& page);
 
   /* If there are valid file names at the command line, we process them */
   if (iFiles < argc)
   {
-    prnHeader (1);
-
     for (i = iFiles; i < argc; i++)
     {
       xfopen (& textF, argv [i]);
 
-      while (! feof (textF)) prnPage (textF);
+      while (! feof (textF)) loadPage (textF, & page);
 
       xfclose (textF);
     }
@@ -58,52 +62,36 @@ void pager (int argc, char * argv [], int iFiles)
   /* There are no file names at the command line, we process stdin */
   else
   {
-    while (! feof (stdin)) prnPage (stdin);
+    while (! feof (stdin)) loadPage (stdin, & page);
   }
+
+  freePage (& page);
 }
 
-void prnPage (FILE * textF)
+void loadPage (FILE * textF, struct pages * page)
 {
-  int printed = 0;
-  static int delayed = 0;
-  static int nLines = 0, nPages = 2;
+  int full = 0;
   char * line = NULL;
   size_t N = 0l;
 
-  while (nLines < nRows)
+  while (! feof (textF))
   {
-    /* Get a single line */
-    if (getline (& line, & N, textF) != EOF)
-    {
-      /* Print a header with the page number */
-      if (delayed)
-      {
-        delayed = 0;
-        prnHeader (nPages++);
-      }
+    if (getline (& line, & N, textF) == EOF) break;
 
-      /* Print the line we just read */
-      printed = prnLine (line, & nLines, & nPages);
+    if (strlen (line) > nCols)
+      full = splitLines (page, line);
+    else
+      full = saveLine (page, line);
 
-      /*
-       * If we reach the page limit, print te extra new line
-       * "delayed" will make sure we print the header on the next iteration.
-       */
-      if ((nLines == nRows) && (! printed))
-      {
-        nLines = 0, delayed = 1;
-        printf ("\n");
-        /* Ask for the user input, only if the input is NOT stdin. */
-        if (isatty (STDIN_FILENO)) userInput ();
-      }
-    }
-    else break;
+    if (full) fmtPage (page);
   }
+
+  fmtPage (page);
 }
 
-int prnLine (char * line, int * nLines, int * nPages)
+int splitLines (struct pages * page, char * line)
 {
-  int printed = 0;
+  int full = 0;
   char * mark = NULL, block [nCols + 1];
 
   mark = line;
@@ -111,19 +99,14 @@ int prnLine (char * line, int * nLines, int * nPages)
   while (strlen (mark))
   {
     /* Break the line in "nCols" blocks */
-    if (strlen (mark) > nCols)
+    if (strlen (mark) > (nCols - 1lu))
     {
-      memcpy (block, mark, nCols);
+      memcpy (block, mark, (nCols - 1lu));
+      block [nCols - 1lu] = '\n';
       block [nCols] = '\0';
       mark += nCols;
 
-      printf ("%d:", * nLines + 1);
-      printf ("%s\n", block);
-
-      (* nLines)++;
-      /* Check if "nLines", the lines already printed, equals "nCols" */
-      if (* mark)
-        printed = checkPage (nLines, nPages);
+      full = saveLine (page, block);
     }
     /* The line is now shorter than "nCols" */
     else
@@ -132,36 +115,47 @@ int prnLine (char * line, int * nLines, int * nPages)
       block [strlen (mark)] = '\0';
       mark += strlen (mark);
 
-      printf ("%d:", * nLines + 1);
-      printf ("%s", block);
-
-      (* nLines)++;
-      if (* mark)
-        printed = checkPage (nLines, nPages);
+      full = saveLine (page, block);
     }
   }
 
-  return printed;
+  return full;
 }
 
-/* 
- * Check if "nLines", the lines already printed, equals "nCols".
- * If it is print the extra new line.
- * If the input is a file, ask for user input.
- */
-int checkPage (int * nLines, int * nPages)
+void fmtPage (struct pages * page)
 {
-  int printed = 0;
+  static int nPages = 1, lv = 0, h = 1;
 
-  if (* nLines == nRows)
+ /* 
+  * El bucle debe contemplar que el buffer puede contener más de una página.
+  * Además las páginas no tendrán una longitud fija.
+  * 1.- Bolcar el buffer completo en la pantalla.
+  * 2.- Mantener un registro del número de lineas_volcadas.
+  * 3.- Volcar un número de lineas = nRows - lineas_volcadas.
+  * 4.- lineas_volcadas = nRows.
+  * 5.- Repetir 3 y 4 hasta que el buffer esté vacío.
+  */
+
+  while (notEmpty (page))
   {
-    * nLines = 0, printed = 1;
-    printf ("\n");
-    if (isatty (STDIN_FILENO)) userInput ();
-    prnHeader ((* nPages)++);
-  }
+    if (h)
+    {
+      h = 0;
+      prnHeader (nPages++);
+    }
 
-  return printed;
+    lv++;
+
+    printf ("%s", loadLine (page));
+
+    if (lv == nRows)
+    {
+      h = 1, lv = 0;
+      printf ("\n");
+      if (isatty (STDIN_FILENO)) userInput ();
+    }
+  }
+  resetPage (page);
 }
 
 /* Printing a header with the page number */
@@ -178,6 +172,9 @@ void userInput (void)
   printf ("Hit intro to continue.");
   while (getchar () != '\n');
 }
+
+int getLines (void) { return nRows; }
+int getCols  (void) { return nCols; }
 
 /* 
  * Parsing the command line to get the number of lines and columns.
@@ -262,7 +259,6 @@ unsigned long xstrtoul (const char * s)
 
   return parsed;
 }
-
 /* Checking errors when opening files */
 void xfopen (FILE ** f, char * name)
 {
