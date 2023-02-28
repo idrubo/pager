@@ -11,7 +11,7 @@ All three exercises contain a Makefile to compile the code.
 I didn't have much diffilculty when solving exercises 1 and 3.
 
 Exercise 2, a bit longer, was a bit more difficult. My first aproach was
-printing the lines as they are read, it had a catch. If the line is two
+printing the lines as they are read, it had a catch. If the line is too
 big it must be broken down, so it is possible to reach the columns limit
 when reading a line. So, the header and the extra new line may be inserted
 when printing a page or when splitting a line, making the program somewhat
@@ -65,7 +65,7 @@ computing ((1 + n) * n), so:
 
 ((1 + n) * n) <= INT_MAX
 
-2
+ 2
 n  +  n - INT_MAX <= 0
 
 and we get:
